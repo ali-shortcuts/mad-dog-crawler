@@ -1,0 +1,24 @@
+{
+  "name": "mad-dog-crawler",
+  "version": "1.0.0",
+  "description": "سگ دیوانه - خزنده بی‌نهایت قدرتمند برای روز مبادا - بدون محدودیت داخلی",
+  "type": "module",
+  "scripts": {
+    "crawl": "tsx src/crawler.ts",
+    "dev": "tsx src/crawler.ts --url https://example.com",
+    "build": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "p-queue": "^8.1.0",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
+  }
+}
