@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 /**
- * MAD DOG V2 - سگ دیوانه ارتقا یافته
- * ویژن + اسکرول بی‌نهایت + اوتو-کلیکر + ثبت‌نام خودکار (فقط سایت خودت)
+ * MAD DOG V2 - Vision + Infinite Scroll + Auto-Clicker + Auto-Register (only your own site)
  * D:\opencode-projects\mad-dog-crawler\src\crawler-vision.ts:1
  * 
- * برای سایت خودت: کپچا را در حالت dev با کلید تست غیرفعال کن، نه دور بزن
+ * For your own site: disable captcha in dev with test key, don't bypass
  * - reCAPTCHA test key: sitekey 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
- * - یا در سرور خودت CAPTCHA را برای IP تست خاموش کن
+ * - Or disable CAPTCHA for test IP on your server
  */
 
 import * as cheerio from 'cheerio'
@@ -22,7 +21,7 @@ class MadDogVision {
   private visited = new Set<string>()
   private results: any[] = []
 
-  // ویژن: تحلیل HTML مثل چشم
+  // Vision: analyze HTML like eyes
   analyzeVision(html: string, url: string): VisionResult {
     const $ = cheerio.load(html)
     const hasCaptcha = html.includes('captcha') || html.includes('g-recaptcha') || html.includes('hcaptcha') || $('iframe[src*="captcha"]').length > 0
@@ -38,20 +37,20 @@ class MadDogVision {
     return { hasCaptcha, forms, buttons }
   }
 
-  // اسکرول بی‌نهایت (شبیه‌سازی: همه لینک‌های paginated را دنبال می‌کند)
+  // Infinite scroll (simulated: follow all paginated links)
   async infiniteScrollFetch(startUrl: string, maxScrolls = 10) {
     let url = startUrl
     let scroll = 0
     while (url && scroll < maxScrolls) {
-      console.log(`📜 اسکرول ${scroll + 1}/${maxScrolls} -> ${url}`)
+      console.log(`📜 Scroll ${scroll + 1}/${maxScrolls} -> ${url}`)
       const res = await fetch(url)
       const html = await res.text()
       const vision = this.analyzeVision(html, url)
       
       if (vision.hasCaptcha) {
-        console.log(`⚠️ کپچا شناسایی شد در ${url} - توقف برای حل دستی (برای سایت خودت: از کلید تست استفاده کن)`)
+        console.log(`⚠️ Captcha detected at ${url} - pause for manual solve (for your own site: use test key)`)
         console.log(`   reCAPTCHA test sitekey: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`)
-        // مکث - حل دستی، نه دور زدن خودکار
+        // Pause - manual solve, no auto bypass
         break
       }
 
@@ -59,11 +58,11 @@ class MadDogVision {
       this.results.push({ url, title: $('title').text(), vision, at: new Date().toISOString() })
       this.visited.add(url)
 
-      // پیدا کردن لینک "بعدی" برای اسکرول
-      const next = $('a[rel="next"], a:contains("Next"), a:contains("بعدی"), button:contains("Load more")').attr('href')
+      // Find "next" link for scroll
+      const next = $('a[rel="next"], a:contains("Next"), button:contains("Load more")').attr('href')
       if (next) url = new URL(next, url).toString()
       else {
-        // دنبال همه لینک‌های داخلی برای خزش
+        // Follow all internal links
         const links: string[] = []
         $('a[href]').each((_, a) => {
           try { const abs = new URL($(a).attr('href')!, url).toString(); if (abs.startsWith('http') && new URL(abs).hostname === new URL(startUrl).hostname) links.push(abs) } catch {}
@@ -75,44 +74,44 @@ class MadDogVision {
     }
   }
 
-  // اوتو-کلیکر: کلیک خودکار روی سلکتور
+  // Auto-clicker: automatic click on selector
   async autoClick(url: string, selector: string) {
-    console.log(`🖱️ اوتو-کلیکر: ${selector} در ${url}`)
+    console.log(`🖱️ Auto-clicker: ${selector} at ${url}`)
     const res = await fetch(url)
     const html = await res.text()
     const $ = cheerio.load(html)
     const el = $(selector)
-    if (el.length === 0) { console.log(`❌ المنت ${selector} پیدا نشد`); return }
+    if (el.length === 0) { console.log(`❌ Element ${selector} not found`); return }
     const href = el.attr('href') || el.attr('data-href')
     const action = el.attr('hx-get') || href
-    console.log(`✅ کلیک روی ${selector} -> ${action || 'form submit'}`)
+    console.log(`✅ Click on ${selector} -> ${action || 'form submit'}`)
     if (action) {
       const nextUrl = new URL(action, url).toString()
       await this.infiniteScrollFetch(nextUrl, 3)
     }
   }
 
-  // ثبت‌نام خودکار (فقط سایت خودت - با اجازه)
+  // Auto-register (only your own site - with permission)
   async autoRegister(url: string, user: { email: string; password: string; name?: string }) {
-    console.log(`📝 ثبت‌نام خودکار در ${url} برای ${user.email}`)
+    console.log(`📝 Auto-register at ${url} for ${user.email}`)
     const res = await fetch(url)
     const html = await res.text()
     const vision = this.analyzeVision(html, url)
     
     if (vision.hasCaptcha) {
-      console.log(`⚠️ کپچا فعال است - برای سایت خودت:`)
-      console.log(`   1. در env سایت بگذار: RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI (کلید تست گوگل)`)
-      console.log(`   2. یا برای IP خودت کپچا را خاموش کن`)
-      console.log(`   3. سپس دوباره اجرا کن - نه دور زدن`)
+      console.log(`⚠️ Captcha active - for your own site:`)
+      console.log(`   1. Set env: RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI (Google test key)`)
+      console.log(`   2. Or disable captcha for your IP`)
+      console.log(`   3. Then run again - no bypass`)
       return { success: false, reason: 'captcha_requires_manual_or_test_key' }
     }
 
-    if (vision.forms.length === 0) { console.log(`❌ فرمی پیدا نشد`); return { success: false } }
+    if (vision.forms.length === 0) { console.log(`❌ No form found`); return { success: false } }
     
     const form = vision.forms[0]
-    console.log(`📋 فرم پیدا شد: ${form.action} با فیلدها: ${form.inputs.join(', ')}`)
+    console.log(`📋 Form found: ${form.action} with fields: ${form.inputs.join(', ')}`)
     
-    // پر کردن خودکار - فقط فیلدهای استاندارد
+    // Auto fill - only standard fields
     const body = new URLSearchParams()
     for (const name of form.inputs) {
       if (name.includes('email')) body.set(name, user.email)
@@ -121,40 +120,40 @@ class MadDogVision {
       else if (name !== 'unknown') body.set(name, 'test')
     }
 
-    console.log(`📤 ارسال به ${form.action} با ${body.toString().slice(0,100)}...`)
-    // در سایت خودت اگر CSRF دارد، اول توکن را از html بگیر
+    console.log(`📤 Send to ${form.action} with ${body.toString().slice(0,100)}...`)
+    // For your own site if CSRF, get token from html first
     const $ = cheerio.load(html)
     const csrf = $('input[name="_csrf"], input[name="csrf_token"], meta[name="csrf-token"]').attr('value') || $('meta[name="csrf-token"]').attr('content')
     if (csrf) body.set('_csrf', csrf)
 
-    // ارسال واقعی - فقط اگر سایت خودت باشد
+    // Real send - only if your own site
     try {
       const target = new URL(form.action, url).toString()
       const resp = await fetch(target, { method: 'POST', body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
       const text = await resp.text()
-      console.log(`📥 پاسخ: ${resp.status} - ${text.slice(0,300)}`)
-      // API را استخراج کن - لینک‌های /api
+      console.log(`📥 Response: ${resp.status} - ${text.slice(0,300)}`)
+      // Extract API - links /api
       const apiLinks = [...text.matchAll(/\/api\/[a-z0-9\/_-]+/gi)].map(m=>m[0]).slice(0,5)
-      if (apiLinks.length) console.log(`🔌 API های پیدا شده: ${apiLinks.join(', ')}`)
+      if (apiLinks.length) console.log(`🔌 APIs found: ${apiLinks.join(', ')}`)
       return { success: resp.ok, status: resp.status, apis: apiLinks }
-    } catch (e:any) { console.log(`❌ خطا: ${e.message}`); return { success: false, error: e.message } }
+    } catch (e:any) { console.log(`❌ Error: ${e.message}`); return { success: false, error: e.message } }
   }
 
   save(out: string) {
     fs.mkdirSync(path.dirname(out), { recursive: true })
     fs.writeFileSync(out, JSON.stringify({ results: this.results, count: this.results.length }, null, 2), 'utf-8')
-    console.log(`💾 ذخیره شد: ${out}`)
+    console.log(`💾 Saved: ${out}`)
   }
 }
 
 const program = new Command()
 program
-  .option('--url <url>', 'URL شروع', 'https://example.com')
-  .option('--scroll <n>', 'اسکرول بی‌نهایت', '5')
-  .option('--click <selector>', 'اوتو-کلیکر selector', '')
-  .option('--register <email>', 'ایمیل تست ثبت‌نام (فقط سایت خودت)', '')
-  .option('--password <pass>', 'پسورد تست', 'Test123!')
-  .option('--out <path>', 'خروجی', 'D:\\opencode-cache\\mcp\\mad-dog-v2.json')
+  .option('--url <url>', 'Start URL', 'https://example.com')
+  .option('--scroll <n>', 'Infinite scroll', '5')
+  .option('--click <selector>', 'Auto-clicker selector', '')
+  .option('--register <email>', 'Test email for register (only your own site)', '')
+  .option('--password <pass>', 'Test password', 'Test123!')
+  .option('--out <path>', 'Output', 'D:\\opencode-cache\\mcp\\mad-dog-v2.json')
   .action(async (o) => {
     const bot = new MadDogVision()
     if (o.register) {

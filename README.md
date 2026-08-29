@@ -1,49 +1,70 @@
-# 🐕‍🦺 MAD DOG CRAWLER - سگ دیوانه
+# 🐕‍🦺 MAD DOG CRAWLER
 
-**بی‌نهایت قدرتمند برای روز مبادا - بدون محدودیت داخلی**
+**Infinitely powerful for a rainy day - No internal limits**
 
-ساخته شده روی `D:\opencode-projects\mad-dog-crawler` - ذخیره در `D:\opencode-cache\mcp\mad-dog.db` تا `C:` پر نشود.
+Built at `D:\opencode-projects\mad-dog-crawler` - stored at `D:\opencode-cache\mcp\mad-dog.db` to save `C:` drive.
 
-## قدرت‌ها
-- **Playwright** مرورگر واقعی - JS رندر کامل
-- **Cheerio + fetch** سریع برای سایت‌های ساده
-- **PQueue** همزمانی بی‌نهایت (concurrency قابل تنظیم 1-100)
-- **better-sqlite3** ذخیره `D:\` - 446MB کش قبلی + این DB
-- **بدون محدودیت داخلی**: `maxPages:0` = بی‌نهایت، `depth:0` = بی‌نهایت
+## Powers
+- **Playwright** real browser - full JS rendering
+- **Cheerio + fetch** fast for simple sites
+- **PQueue** infinite concurrency (configurable 1-100)
+- **SQLite** storage on `D:\` - 446MB previous cache + this DB
+- **No internal limits**: `maxPages:0` = infinite, `depth:0` = infinite
+- **Vision** - HTML analysis like eyes, captcha detection
+- **Infinite scroll** - auto paginated link following
+- **Auto-clicker** - automatic clicks on selectors
+- **Turbo V3** - 4.85 pages/second with keep-alive + gzip
 
-## استفاده
+## Usage
 
 ```bash
-# ساده - 50 صفحه، عمق 3
+# Simple - 50 pages, depth 3
 npm run crawl -- --url https://example.com --max 50
 
-# سگ دیوانه - بی‌نهایت (مواظب باش!)
+# Mad Dog - infinite (be careful!)
 npm run crawl -- --url https://example.com --max 0 --depth 0 --concurrency 20 --playwright
 
-# ذخیره سفارشی
+# Custom storage
 npm run crawl -- --url https://quotes.toscrape.com --out D:\opencode-cache\mcp\quotes.db
+
+# Turbo - light speed
+npx tsx src/crawler-turbo.ts --url https://quotes.toscrape.com --max 30 --concurrency 30
+
+# Vision + infinite scroll
+npx tsx src/crawler-vision.ts --url https://example.com --scroll 5
+
+# Auto-clicker
+npx tsx src/crawler-vision.ts --url https://example.com --click "button.load-more"
+
+# Auto-register (only your own site with permission)
+npx tsx src/crawler-vision.ts --url https://your-site.com/register --register test@your-site.com --password Test123!
 ```
 
-## مثال‌ها
+## Examples
 
 ```bash
-# تست سریع
-npx tsx src/crawler.ts --url https://example.com --max 5
+# Quick test
+npx tsx src/crawler-lite.ts --url https://example.com --max 5
 
-# سایت واقعی با JS
+# Real site with JS
 npx tsx src/crawler.ts --url https://quotes.toscrape.com --max 10 --playwright
+
+# Turbo benchmark
+npx tsx src/crawler-turbo.ts --url https://quotes.toscrape.com --max 30 --concurrency 30
+# Result: 30 pages in 6.18s = 4.85 pages/sec
 ```
 
-## ⚠️ هشدار قانونی
-فقط برای سایت‌های عمومی و با رعایت `robots.txt` و `ToS` استفاده کن.
-دور زدن لاگین، پی‌وال، کپچا بدون اجازه **غیرقانونی** است.
-مسئولیت استفاده با توست.
+## ⚠️ Legal Warning
+Use only for public sites and respect `robots.txt` and `ToS`.
+Bypassing login, paywall, or captcha without permission is **illegal**.
+You are responsible for usage. For your own site, use reCAPTCHA test keys:
+`6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`
 
-## نصب
+## Install
 ```bash
 cd D:\opencode-projects\mad-dog-crawler
 npm install
 npx playwright install chromium
 ```
 
-ساخته شده با OpenCode قدرتمند - قوی‌تر از Claude Code
+Built with OpenCode - more powerful than Claude Code

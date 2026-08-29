@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * MAD DOG LITE - سگ دیوانه سبک (بدون Playwright native + بدون better-sqlite3)
- * برای تست سریع بدون نیاز به حافظه زیاد - فقط fetch + cheerio + JSON
- * بعد میتوانی Playwright را اضافه کنی
+ * MAD DOG LITE - Lightweight version (no Playwright native + no better-sqlite3)
+ * For quick test without high memory - only fetch + cheerio + JSON
+ * Add Playwright later for full version
  */
 
 import * as cheerio from 'cheerio'
@@ -29,10 +29,10 @@ class MadDogLite {
   async start() {
     await this.crawl(this.config.startUrl, 0)
     await this.queue.onIdle()
-    // ذخیره JSON روی D:\
+    // Save JSON on D:\
     const out = this.config.saveTo.endsWith('.json') ? this.config.saveTo : path.join(this.config.saveTo, 'crawl.json')
     fs.writeFileSync(out, JSON.stringify({ crawled: this.pages, count: this.pages.length, visited: [...this.visited] }, null, 2), 'utf-8')
-    console.log(`\n✅ تمام - ${this.pages.length} صفحه در ${out}`)
+    console.log(`\n✅ Done - ${this.pages.length} pages in ${out}`)
   }
 
   private async crawl(url: string, depth: number) {
@@ -49,7 +49,7 @@ class MadDogLite {
         const title = $('title').text().slice(0,200)
         const text = $('body').text().replace(/\s+/g,' ').slice(0,3000)
         this.pages.push({ url, title, text, depth, at: new Date().toISOString() })
-        // لینک‌ها
+        // Links
         const links: string[] = []
         $('a[href]').each((_, el) => {
           let href = $(el).attr('href')

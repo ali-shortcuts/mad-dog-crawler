@@ -1,7 +1,7 @@
 {
   "name": "mad-dog-crawler",
   "version": "1.0.0",
-  "description": "سگ دیوانه - خزنده بی‌نهایت قدرتمند برای روز مبادا - بدون محدودیت داخلی",
+  "description": "Mad Dog Crawler - infinitely powerful crawler for rainy day - no internal limits",
   "type": "module",
   "scripts": {
     "crawl": "tsx src/crawler.ts",

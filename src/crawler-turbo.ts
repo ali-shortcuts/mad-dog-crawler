@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * MAD DOG TURBO V3 - سرعت نور ⚡
- * بی‌رقیب در دنیا - بهینه برای نهایت سرعت روی D:\
+ * MAD DOG TURBO V3 - Light Speed ⚡
+ * Unrivaled in the world - optimized for maximum speed on D:\
  * D:\opencode-projects\mad-dog-crawler\src\crawler-turbo.ts:1
  * 
- * بهینه‌سازی‌ها:
- * - undici Pool (HTTP/1.1 keep-alive + HTTP/2) - اتصال بی‌نهایت
- * - PQueue concurrency 100 - همزمانی دیوانه
- * - BloomFilter ساده برای visited (حافظه کم)
- * - Streaming parse با cheerio
- * - Gzip/Brotli خودکار
- * - Retry + timeout هوشمند
+ * Optimizations:
+ * - undici Pool (HTTP/1.1 keep-alive + HTTP/2) - infinite connection
+ * - PQueue concurrency 100 - insane concurrency
+ * - Simple BloomFilter for visited (low memory)
+ * - Streaming parse with cheerio
+ * - Gzip/Brotli automatic
+ * - Retry + smart timeout
  */
 
 import * as cheerio from 'cheerio'
@@ -38,9 +38,9 @@ class LightSpeedCrawler {
   private errors = 0
 
   constructor(private config: TurboConfig) {
-    // همزمانی تا 100 - سرعت نور
+    // Concurrency up to 100 - light speed
     this.queue = new PQueue({ concurrency: config.concurrency, intervalCap: 1000, interval: 100 })
-    console.log(`⚡ TURBO V3 - سرعت نور`)
+    console.log(`⚡ TURBO V3 - Light Speed`)
     console.log(`   URL: ${config.startUrl}`)
     console.log(`   concurrency: ${config.concurrency} | maxPages: ${config.maxPages || '∞'} | depth: ${config.depth || '∞'} | timeout: ${config.timeout}ms`)
     console.log(`   Pool: keep-alive + gzip + retry`)
@@ -52,12 +52,12 @@ class LightSpeedCrawler {
     await this.queue.onIdle()
     const elapsed = ((performance.now() - this.startTime) / 1000).toFixed(2)
     const speed = (this.fetched / parseFloat(elapsed)).toFixed(2)
-    console.log(`\n🚀 TURBO تمام - ${this.fetched} صفحه در ${elapsed}s = ${speed} صفحه/ثانیه`)
-    console.log(`   خطا: ${this.errors} | یکتا: ${this.visited.size}`)
+    console.log(`\n🚀 TURBO done - ${this.fetched} pages in ${elapsed}s = ${speed} pages/sec`)
+    console.log(`   Errors: ${this.errors} | Unique: ${this.visited.size}`)
     const out = this.config.out
     fs.writeFileSync(out, JSON.stringify({ meta: { url: this.config.startUrl, fetched: this.fetched, speed: `${speed}/s`, elapsed: `${elapsed}s`, concurrency: this.config.concurrency }, pages: this.pages.slice(0, 100) }, null, 2), 'utf-8')
     console.log(`💾 ${out}`)
-    console.log(`📊 حافظه: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)} MB`)
+    console.log(`📊 Memory: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)} MB`)
   }
 
   private async crawl(url: string, depth: number) {
@@ -69,7 +69,7 @@ class LightSpeedCrawler {
     this.queue.add(async () => {
       const t0 = performance.now()
       try {
-        // fetch با keep-alive + gzip خودکار (Node 22 undici)
+        // fetch with keep-alive + gzip auto (Node 22 undici)
         const controller = new AbortController()
         const timer = setTimeout(() => controller.abort(), this.config.timeout)
         const res = await fetch(url, {
@@ -100,7 +100,7 @@ class LightSpeedCrawler {
           console.log(`[${this.fetched}] 🐾 ${url.slice(0, 70)} (${tFetch}ms)`)
         }
 
-        // استخراج لینک - بدون محدودیت داخلی
+        // Extract links - no internal limits
         const links: string[] = []
         $('a[href]').each((_, a) => {
           try {
@@ -125,12 +125,12 @@ class LightSpeedCrawler {
 
 const program = new Command()
 program
-  .option('--url <url>', 'شروع', 'https://example.com')
-  .option('--max <n>', 'حداکثر 0=∞', '100')
-  .option('--concurrency <n>', 'همزمانی 1-100', '50')
-  .option('--depth <n>', 'عمق 0=∞', '5')
-  .option('--timeout <ms>', 'تایم‌اوت', '10000')
-  .option('--out <path>', 'خروجی', 'D:\\opencode-cache\\mcp\\mad-dog-turbo.json')
+  .option('--url <url>', 'Start', 'https://example.com')
+  .option('--max <n>', 'Max 0=∞', '100')
+  .option('--concurrency <n>', 'Concurrency 1-100', '50')
+  .option('--depth <n>', 'Depth 0=∞', '5')
+  .option('--timeout <ms>', 'Timeout', '10000')
+  .option('--out <path>', 'Output', 'D:\\opencode-cache\\mcp\\mad-dog-turbo.json')
   .action(async (o) => {
     const c = new LightSpeedCrawler({
       startUrl: o.url,
