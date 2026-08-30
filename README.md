@@ -60,6 +60,29 @@ Bypassing login, paywall, or captcha without permission is **illegal**.
 You are responsible for usage. For your own site, use reCAPTCHA test keys:
 `6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`
 
+## 🧠 BRAIN - Single Intelligence, Auto Tool Calling (NEW)
+
+**One request, brain auto-calls needed tools - wired together**
+
+```bash
+# One request -> brain decides tools
+npx tsx src/mad-dog-brain.ts --task "crawl https://reqres.in and bring APIs"
+# 🧠 Plan: [api-finder -> lite -> memory] -> executes 3 tools
+
+npx tsx src/mad-dog-brain.ts --task "turbo crawl https://quotes.toscrape.com with vision and auto-auth"
+# 🧠 Plan: [auto-auth -> vision -> turbo -> memory] -> executes 4 tools
+```
+
+**How it works `src/brain/index.ts:1`:**
+- `think(request)` - sequential-thinking, parses task, chooses tools: `lite`, `turbo`, `vision`, `api-finder`, `auto-auth`, `memory`
+- `execute(plan)` - calls all tools in one request via `PQueue`, saves to `D:\opencode-cache\mcp\brain-*.json`
+- `memory` - remembers last request in `D:\opencode-cache\mcp\brain-memory.json`
+
+**Wiring:**
+```
+Request -> Brain.think() -> Plan [tools] -> Brain.execute() -> lite/turbo/vision/api-finder/auto-auth -> memory -> D:\opencode-cache\mcp\brain-result.json
+```
+
 ## Install
 ```bash
 cd D:\opencode-projects\mad-dog-crawler
@@ -68,3 +91,4 @@ npx playwright install chromium
 ```
 
 Built with OpenCode - more powerful than Claude Code
+Organized precisely on D:\ to save C:\ - Strong AI wired
