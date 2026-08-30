@@ -41,7 +41,11 @@ export class MadDogBrain {
       tools.push('vision')
       reason += 'Need vision/scroll -> vision; '
     }
-    if (r.includes('turbo') || r.includes('fast') || r.includes('light speed') || r.includes('100')) {
+    if (r.includes('thousands') || r.includes('هزاران') || r.includes('1000') || r.includes('100')) {
+      tools.push('thousands' as any)
+      reason += 'Need thousands -> thousands; '
+    }
+    if (r.includes('turbo') || r.includes('fast') || r.includes('light speed')) {
       tools.push('turbo')
       reason += 'Need speed -> turbo; '
     }
@@ -88,6 +92,9 @@ export class MadDogBrain {
         case 'auto-auth':
           results.autoAuth = await this.callAutoAuth(plan.params.url)
           break
+        case 'thousands':
+          results.thousands = await this.thousands([plan.params.url + '/posts/1', plan.params.url + '/posts/2', plan.params.url].flatMap(u => Array(30).fill(u)), 50)
+          break
         case 'memory':
           results.memory = this.remember(plan)
           break
@@ -106,6 +113,20 @@ export class MadDogBrain {
       let out = ''
       p.stdout.on('data', (d) => out += d.toString())
       p.on('close', () => resolve({ tool: 'lite', output: out.slice(0, 500) }))
+    })
+  }
+
+  // Thousands support
+  async thousands(urls: string[], concurrency = 100) {
+    const { spawn } = await import('child_process')
+    const tmpFile = 'D:\\opencode-cache\\mcp\\thousands-urls.txt'
+    const fs = await import('fs')
+    fs.writeFileSync(tmpFile, urls.join('\n'), 'utf-8')
+    return new Promise((resolve) => {
+      const p = spawn('npx', ['tsx', 'src/mad-dog-thousands.ts', '--file', tmpFile, '--concurrency', String(concurrency), '--max', String(urls.length)], { cwd: 'D:\\opencode-projects\\mad-dog-crawler', shell: true })
+      let out = ''
+      p.stdout.on('data', (d) => out += d.toString())
+      p.on('close', () => resolve({ tool: 'thousands', count: urls.length, output: out.slice(0, 800) }))
     })
   }
 
